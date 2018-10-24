@@ -1,31 +1,31 @@
 ﻿using MaterialSkin.Controls;
 using MaterialSkin;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using MurbongImageMix.lib;
+using System.Diagnostics;
+using Palc.Imaging;
 
 namespace MurbongImageMix
 {
 
     public partial class Form1 : MaterialForm
     {
+        public static int value;
 
+        public static void SetProgress(int progress)
+        {
+            value = progress;
+        }
         public Form1()
         {
             InitializeComponent();
-
+            Debug.WriteLine("HI");
             MaterialSkinManager materialSkinManager = MaterialSkinManager.Instance;
             materialSkinManager.AddFormToManage(this);
-            materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
+            materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
+            MaterialProgressBar materialProgressBar1 = new MaterialProgressBar();
 
             materialSkinManager.ColorScheme = new ColorScheme(
         Primary.Blue400, Primary.Blue500,
@@ -34,7 +34,7 @@ namespace MurbongImageMix
     );
         }
 
-        private string OpenBitMap()
+        private Bitmap OpenBitMap()
         {
             Bitmap img;
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -42,88 +42,93 @@ namespace MurbongImageMix
             openFileDialog.InitialDirectory = Application.StartupPath;
             openFileDialog.DefaultExt = "png";
             openFileDialog.Filter = "png(*.png)|*.png";
-            string path;
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                path = openFileDialog.FileName;
+                string path = openFileDialog.FileName;
                 img = new Bitmap(path);
             }
             else
             {
                 img = null;
-                path = "";
             }
 
+            return img;
+        }
+
+        private String SaveFilePath()
+        {
+            string path;
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "저장하기";
+            saveFileDialog.InitialDirectory = Application.StartupPath;
+            saveFileDialog.DefaultExt = "png";
+            saveFileDialog.Filter = "png(*.png)|*.png";
+
+            if(saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                path = saveFileDialog.FileName;
+            }
+            else
+            {
+                path = "error.png";
+            }
             return path;
-        }
-
-        private Bitmap GammaCorrection(Bitmap img, double gamma, double c = 1d)
-        {
-            int width = img.Width;
-            int height = img.Height;
-            BitmapData srcData = img.LockBits(
-                new Rectangle(0, 0, width, height),
-                ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb); // BitmapData를 새로 만든다. PixelFormat.Format32bppArgb
-            int bytes = srcData.Stride * srcData.Height;//byte의 크기를 구하는 코드 Stride = width
-            byte[] buffer = new byte[bytes];
-            byte[] result = new byte[bytes];
-            Marshal.Copy(srcData.Scan0, buffer, 0, bytes);
-            img.UnlockBits(srcData);
-            int current = 0;
-            int cChannels = 3;
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    current = y * srcData.Stride + x * 4;
-                    for (int i = 0; i < cChannels; i++)
-                    {
-                        double range = (double)buffer[current + i] / 255;
-                        double correction = c * Math.Pow(range, gamma); // Gamma = Fade*(RGB^Gamma)
-                        result[current + i] = (byte)(correction * 255); // I = R,G,B Number
-                    }
-                    result[current + 3] = 255; // Alpha Number;
-                }
-            }
-            Bitmap resImg = new Bitmap(width, height);
-            BitmapData resData = resImg.LockBits(new Rectangle(0, 0, width, height),
-                ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-            Marshal.Copy(result, 0, resData.Scan0, bytes);
-            resImg.UnlockBits(resData);
-            return resImg;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Bitmap png = new Bitmap(OpenBitMap());
-            Bitmap png2 = new Bitmap(OpenBitMap());
-            png = GammaCorrection(png, 0.023);
-            png2 = GammaCorrection(png2, 1, 0.6);
-            Bitmap out1 = new Bitmap(png.Size.Width * 2, png.Size.Height * 2);
-
-            for (int i = 0; i < out1.Size.Width; i++)
-            {
-                for (int j = 0; j < out1.Size.Height; j++)
-                {
-                    if (i % 2 == 0 && j % 2 == 0)
-                    {
-                        out1.SetPixel(i, j, png.GetPixel(i / 2, j / 2));
-                    }
-                    else
-                    {
-                        out1.SetPixel(i, j, png2.GetPixel(i / 2, j / 2));
-                    }
-
-                }
-            }
-
-            out1.Save("HELLO2.png");
 
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
+
+        }
+
+        private void materialFlatButton1_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+                Bitmap img1 = OpenBitMap();
+                pictureBox1.Image = img1;
+                Bitmap img2 = OpenBitMap();
+
+
+                if (img1.Size == img2.Size)
+                {
+
+
+                    img1 = Util.GammaCorrection(img1, 0.023,1);
+                    img2 = Util.GammaCorrection(img2, 1, 0.8);
+
+
+
+                    Bitmap out1 = Util.MergeBitmap(img1, img2);
+                    pictureBox1.Image = out1;
+
+
+
+
+
+                    string path = SaveFilePath();
+
+                    out1.Save(path);
+
+                    Png png = new Png(path);
+
+                    png.RemoveChunk(Png.ChunkType.RgbColorSpace);
+                    png.SetGammaChunk();
+
+                    png.Save(path);
+                }
+                else
+                {
+                    MessageBox.Show("두 이미지는 사이즈가 같아야합니다.");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("잘못된 접근입니다.");
+
+            }
 
         }
     }
