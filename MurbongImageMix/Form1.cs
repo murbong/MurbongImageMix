@@ -1,4 +1,5 @@
 ﻿using MaterialSkin.Controls;
+using MaterialSkin;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MurbongImageMix
-{ 
+{
 
     public partial class Form1 : MaterialForm
     {
@@ -21,6 +22,16 @@ namespace MurbongImageMix
         public Form1()
         {
             InitializeComponent();
+
+            MaterialSkinManager materialSkinManager = MaterialSkinManager.Instance;
+            materialSkinManager.AddFormToManage(this);
+            materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
+
+            materialSkinManager.ColorScheme = new ColorScheme(
+        Primary.Blue400, Primary.Blue500,
+        Primary.Blue500, Accent.LightBlue200,
+        TextShade.BLACK
+    );
         }
 
         private string OpenBitMap()

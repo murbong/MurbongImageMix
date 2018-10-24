@@ -33,15 +33,21 @@
             // 
             // materialRaisedButton1
             // 
+            this.materialRaisedButton1.AutoSize = true;
+            this.materialRaisedButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.materialRaisedButton1.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.materialRaisedButton1.Depth = 0;
-            this.materialRaisedButton1.Location = new System.Drawing.Point(363, 523);
+            this.materialRaisedButton1.Font = new System.Drawing.Font("휴먼엑스포", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.materialRaisedButton1.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.materialRaisedButton1.Icon = null;
+            this.materialRaisedButton1.Location = new System.Drawing.Point(532, 527);
             this.materialRaisedButton1.MouseState = MaterialSkin.MouseState.HOVER;
             this.materialRaisedButton1.Name = "materialRaisedButton1";
             this.materialRaisedButton1.Primary = true;
-            this.materialRaisedButton1.Size = new System.Drawing.Size(221, 40);
+            this.materialRaisedButton1.Size = new System.Drawing.Size(52, 36);
             this.materialRaisedButton1.TabIndex = 0;
-            this.materialRaisedButton1.Text = "materialRaisedButton1";
-            this.materialRaisedButton1.UseVisualStyleBackColor = true;
+            this.materialRaisedButton1.Text = "안녕";
+            this.materialRaisedButton1.UseVisualStyleBackColor = false;
             // 
             // Form1
             // 
@@ -57,6 +63,7 @@
             this.Text = "Murbong";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
