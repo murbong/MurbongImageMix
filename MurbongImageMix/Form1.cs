@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using MurbongImageMix.lib;
 using System.Diagnostics;
 using Palc.Imaging;
+using System.IO;
 
 namespace MurbongImageMix
 {
@@ -32,6 +33,15 @@ namespace MurbongImageMix
         Primary.Blue500, Accent.LightBlue200,
         TextShade.BLACK
     );
+
+            string sDirPath;
+            sDirPath = Application.StartupPath + @"\out";
+            DirectoryInfo di = new DirectoryInfo(sDirPath);
+            if (di.Exists == false)// Preset 디렉토리가 없으면 새로 만듭니다.
+            {
+                di.Create();
+            }
+
         }
 
         private Bitmap OpenBitMap()
@@ -61,11 +71,11 @@ namespace MurbongImageMix
             string path;
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Title = "저장하기";
-            saveFileDialog.InitialDirectory = Application.StartupPath;
+            saveFileDialog.InitialDirectory = Application.StartupPath + @"\out";
             saveFileDialog.DefaultExt = "png";
             saveFileDialog.Filter = "png(*.png)|*.png";
 
-            if(saveFileDialog.ShowDialog() == DialogResult.OK)
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 path = saveFileDialog.FileName;
             }
@@ -95,18 +105,11 @@ namespace MurbongImageMix
                 if (img1.Size == img2.Size)
                 {
 
-
-                    img1 = Util.GammaCorrection(img1, 0.023,1);
+                    img1 = Util.GammaCorrection(img1, 0.023, 1);
                     img2 = Util.GammaCorrection(img2, 1, 0.8);
-
-
 
                     Bitmap out1 = Util.MergeBitmap(img1, img2);
                     pictureBox1.Image = out1;
-
-
-
-
 
                     string path = SaveFilePath();
 
