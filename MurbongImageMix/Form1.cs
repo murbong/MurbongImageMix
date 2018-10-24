@@ -110,5 +110,10 @@ namespace MurbongImageMix
             out1.Save("HELLO2.png");
 
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
